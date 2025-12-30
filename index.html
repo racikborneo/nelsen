@@ -1,0 +1,184 @@
+ <!-- Di Buat dan Dikembangkan Oleh Nelsen  -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kamus Dayak Modern</title>
+    <link rel="stylesheet" href="ahe.css">
+    <link rel="manifest" href="manifest.json">
+    <style>
+
+        /* ===== Custom Alert ===== */
+        .alert-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            display: none;
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        .alert-box {
+            background: white;
+            padding: 25px 20px;
+            border-radius: 12px;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+            transform: translateY(-20px);
+            animation: slideDown 0.3s ease forwards;
+        }
+
+        .alert-box p {
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        .alert-buttons button {
+            margin: 0 10px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: all 0.2s;
+        }
+
+        #alertYes {
+            background: #0088cc;
+            color: white;
+        }
+        #alertNo {
+            background: #ccc;
+            color: black;
+        }
+        .alert-buttons button:hover {
+            opacity: 0.8;
+        }
+
+@keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+@keyframes slideDown {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* ===== Install Button ===== */
+        #installBtn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 18px;
+            background: #0088cc;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            display: none;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Chat Container -->
+    <div class="chat-container">
+        <div class="header">
+            Kamus Ahe ↔ Indonesia
+        </div>
+        <div id="chatBox" class="chat-box"></div>
+        <div class="input-area">
+            <input type="text" id="wordInput" placeholder="Ketik kata atau kalimat...">
+            <button id="sendBtn">➤</button>
+        </div>
+    </div>
+
+    <!-- Custom Alert -->
+    <div id="customAlert" class="alert-overlay">
+        <div class="alert-box">
+            <p>
+                apakah ingin uji coba?
+            </p>
+            <div class="alert-buttons">
+                <button id="alertYes">Ya</button>
+                <button id="alertNo">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Install Button -->
+    <button id="installBtn">Install</button>
+
+    <!-- ===== JS ===== -->
+    <script src="script.js"></script>
+    <script>
+        // ===== Custom Alert =====
+        const customAlert = document.getElementById('customAlert');
+        const alertYes = document.getElementById('alertYes');
+        const alertNo = document.getElementById('alertNo');
+
+        window.addEventListener('load', () => {
+            customAlert.style.display = 'flex';
+        });
+
+        alertYes.addEventListener('click', () => {
+            customAlert.style.display = 'none';
+        });
+
+        alertNo.addEventListener('click', () => {
+            window.location.href = 'about:blank';
+        });
+
+        // ===== PWA Install =====
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').then(()=>console.log('SW registered'));
+        }
+
+        let deferredPrompt;
+        const installBtn = document.getElementById('installBtn');
+
+        window.addEventListener('beforeinstallprompt', e => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'block';
+        });
+
+        installBtn.addEventListener('click', async () => {
+            installBtn.style.display = 'none';
+            deferredPrompt.prompt();
+            const {
+                outcome
+            } = await deferredPrompt.userChoice;
+            deferredPrompt = null;
+        });
+
+        window.addEventListener('appinstalled', () => {
+            installBtn.style.display = 'none';
+            console.log('App installed!');
+        });
+    </script>
+
+</body>
+</html>
